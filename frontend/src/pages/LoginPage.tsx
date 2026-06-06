@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { AxiosError } from 'axios';
+import { getApiErrorMessage } from '@/api/errors';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -22,15 +22,7 @@ export default function LoginPage() {
       await login(username, password);
       navigate(from, { replace: true });
     } catch (err) {
-      if (err instanceof AxiosError) {
-        setError(
-          err.response?.data?.non_field_errors?.[0] ??
-            err.response?.data?.detail ??
-            'Identifiants invalides.',
-        );
-      } else {
-        setError('Erreur réseau.');
-      }
+      setError(getApiErrorMessage(err, 'Identifiants invalides.'));
     } finally {
       setLoading(false);
     }

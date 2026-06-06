@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signup } from '@/api/auth';
 import { useAuth } from '@/contexts/AuthContext';
-import { AxiosError } from 'axios';
+import { getApiErrorMessage } from '@/api/errors';
 
 export default function SignupPage() {
   const { refresh } = useAuth();
@@ -23,18 +23,7 @@ export default function SignupPage() {
       await refresh();
       navigate('/upload', { replace: true });
     } catch (err) {
-      if (err instanceof AxiosError) {
-        const data = err.response?.data;
-        const firstError =
-          data?.username?.[0] ??
-          data?.email?.[0] ??
-          data?.password?.[0] ??
-          data?.detail ??
-          'Inscription impossible.';
-        setError(firstError);
-      } else {
-        setError('Erreur réseau.');
-      }
+      setError(getApiErrorMessage(err, 'Inscription impossible.'));
     } finally {
       setLoading(false);
     }
