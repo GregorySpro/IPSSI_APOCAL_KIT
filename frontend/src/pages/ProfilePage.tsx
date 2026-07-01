@@ -10,15 +10,22 @@
  * confirmé » réapparaîtra). La suppression est une action DESTRUCTIVE : on la
  * protège par une confirmation au mot de passe.
  *
- * [TODO J3-bis RGPD] Ajouter ici un bouton « Exporter mes données » (droit à la
- *   portabilité) — placeholder présent plus bas, à implémenter pendant la semaine.
  * [TODO J4] Ajouter un bouton « Signaler un contenu / un quiz » — placeholder.
  */
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { changePassword, deleteAccount, updateProfile } from '@/api/auth';
+import { changePassword, deleteAccount, exportMyData, updateProfile } from '@/api/auth';
 import { getApiErrorMessage } from '@/api/errors';
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 export default function ProfilePage() {
   const { user, refresh } = useAuth();
@@ -45,6 +52,10 @@ export default function ProfilePage() {
   const [delConfirm, setDelConfirm] = useState(false);
   const [delErr, setDelErr] = useState<string | null>(null);
   const [delLoading, setDelLoading] = useState(false);
+
+  // --- Export RGPD ---
+  const [exportErr, setExportErr] = useState<string | null>(null);
+  const [exportLoading, setExportLoading] = useState<'json' | null>(null);
 
   const handleInfo = async (e: FormEvent) => {
     e.preventDefault();
@@ -95,6 +106,19 @@ export default function ProfilePage() {
     } catch (err) {
       setDelErr(getApiErrorMessage(err, 'Suppression impossible.'));
       setDelLoading(false);
+    }
+  };
+
+  const handleExport = async (format: 'json') => {
+    setExportErr(null);
+    setExportLoading(format);
+    try {
+      const blob = await exportMyData(format);
+      downloadBlob(blob, `edututor-export-${Date.now()}.${format}`);
+    } catch (err) {
+      setExportErr(getApiErrorMessage(err, 'Export impossible.'));
+    } finally {
+      setExportLoading(null);
     }
   };
 
@@ -220,20 +244,26 @@ export default function ProfilePage() {
         </form>
       </section>
 
-      {/* Placeholders RGPD / signalement (à compléter pendant la semaine) */}
+      {/* Export RGPD / signalement */}
       <section className="card bg-slate-50">
         <h2 className="text-lg font-semibold text-slate-900 mb-2">Mes données</h2>
         <p className="text-sm text-slate-500 mb-4">
-          Fonctionnalités à construire pendant la semaine APOCAL'IPSSI.
+          Exercez votre droit à la portabilité (RGPD) : téléchargez l'intégralité de vos
+          données personnelles (compte, quiz, réponses).
         </p>
+        {exportErr && (
+          <div className="mb-4 p-3 bg-rose-50 border-l-4 border-rose-500 text-sm text-rose-900 rounded">
+            {exportErr}
+          </div>
+        )}
         <div className="flex flex-wrap gap-3">
           <button
             type="button"
-            disabled
-            title="À implémenter (J3-bis) — droit à la portabilité RGPD"
-            className="btn-secondary opacity-60 cursor-not-allowed"
+            disabled={exportLoading !== null}
+            onClick={() => handleExport('json')}
+            className="btn-primary"
           >
-            Exporter mes données (bientôt)
+            {exportLoading === 'json' ? 'Export…' : 'Exporter (JSON)'}
           </button>
           <button
             type="button"
@@ -251,7 +281,8 @@ export default function ProfilePage() {
         <h2 className="text-lg font-semibold text-rose-700 mb-2">Zone de danger</h2>
         <p className="text-sm text-slate-600 mb-4">
           La suppression de votre compte est <strong>définitive</strong> et efface toutes vos
-          données (quiz, historique). Cette action est irréversible.
+          données (quiz, historique). Cette action est irréversible. Pensez à exporter vos
+          données ci-dessus avant de continuer.
         </p>
         {delErr && (
           <div className="mb-4 p-3 bg-rose-50 border-l-4 border-rose-500 text-sm text-rose-900 rounded">

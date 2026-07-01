@@ -126,3 +126,11 @@ export async function deleteAccount(password: string): Promise<void> {
   await api.delete('/accounts/profile/', { data: { password } });
   clearToken();
 }
+
+/** Export RGPD : télécharge toutes les données du compte (JSON, ZIP ou CSV). */
+export async function exportMyData(format: 'json' | 'zip' | 'csv' = 'json'): Promise<Blob> {
+  const { data } = await api.get<Blob>(`/accounts/me/export/?format=${format}`, {
+    responseType: 'blob',
+  });
+  return data;
+}

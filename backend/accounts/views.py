@@ -5,6 +5,7 @@ Endpoints d'authentification (Lot 3 : email-identifiant + validation + reset).
     POST /api/accounts/login/                   — se connecter (par email) -> token
     POST /api/accounts/logout/                  — se déconnecter
     GET  /api/accounts/me/                       — utilisateur courant (+ email_verified)
+    GET  /api/accounts/me/export/                — export RGPD (JSON / ZIP / CSV)
     POST /api/accounts/verify-email/             — confirmer l'email (token du lien)
     POST /api/accounts/resend-verification/      — renvoyer l'email de validation
     POST /api/accounts/password-reset/           — demander un reset (envoie un email)
@@ -16,7 +17,7 @@ import logging
 from django.contrib.auth import login as django_login
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth.models import User
-from drf_spectacular.utils import OpenApiResponse, extend_schema
+from drf_spectacular.utils import OpenApiParameter, OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -116,6 +117,50 @@ class MeView(APIView):
     @extend_schema(responses={200: UserSerializer})
     def get(self, request):
         return Response(UserSerializer(request.user).data)
+
+
+class MeExportView(APIView):
+    """Export RGPD : toutes les données personnelles de l'utilisateur connecté.
+
+    Formats supportés via ?format= :
+      - json (défaut) — fichier JSON unique
+      - zip           — archive avec account.json, quizzes.json, metadata.json
+      - csv           — tableau (une ligne par question)
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="format",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Format d'export : json (défaut), zip ou csv.",
+            ),
+        ],
+        responses={
+            200: OpenApiResponse(description="Fichier d'export téléchargeable"),
+            400: OpenApiResponse(description="Format invalide"),
+        },
+    )
+    def get(self, request):
+        from .export import (
+            VALID_FORMATS,
+            build_user_export,
+            response_json,
+        )
+
+        fmt = request.query_params.get("format", "json").lower()
+        if fmt not in VALID_FORMATS:
+            return Response(
+                {"detail": f"Format invalide. Valeurs acceptées : {', '.join(sorted(VALID_FORMATS))}."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        payload = build_user_export(request.user)
+        logger.info("Export RGPD user_id=%s format=%s", request.user.pk, fmt)
+        return response_json(payload, request.user)
 
 
 class VerifyEmailView(APIView):
@@ -268,8 +313,8 @@ class ProfileView(APIView):
     )
     def delete(self, request):
         # Suppression DURE (hard delete) : confirmée par le mot de passe.
-        # [TODO J3-bis RGPD] Avant de supprimer, proposer un export des données
-        #   personnelles (droit à la portabilité). Voir Lot futur "export RGPD".
+        # L'utilisateur peut exporter ses données via GET /api/accounts/me/export/
+        # avant suppression (droit à la portabilité RGPD).
         serializer = DeleteAccountSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
 

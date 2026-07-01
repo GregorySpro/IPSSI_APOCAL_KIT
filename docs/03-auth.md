@@ -62,6 +62,7 @@ sequenceDiagram
 | POST | `/api/accounts/login/` | AllowAny | Login par email → `{ token, user }` |
 | POST | `/api/accounts/logout/` | IsAuthenticated | Invalide le token + détruit session |
 | GET | `/api/accounts/me/` | IsAuthenticated | Utilisateur courant (+ `email_verified`) |
+| GET | `/api/accounts/me/export/` | IsAuthenticated | Export RGPD (`?format=json`) |
 | POST | `/api/accounts/verify-email/` | AllowAny | Confirme l'email à partir du token reçu par mail |
 | POST | `/api/accounts/resend-verification/` | IsAuthenticated | Renvoie l'email de validation |
 | POST | `/api/accounts/password-reset/` | AllowAny | Demande un lien de reset (anti-énumération) |
