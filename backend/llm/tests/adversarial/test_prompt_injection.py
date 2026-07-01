@@ -62,9 +62,9 @@ def test_t1_direct_injection_in_clear():
     # Le contenu malveillant doit être DANS les balises <COURS>, jamais avant
     cours_start = prompt.index("<COURS>")
     injection_pos = prompt.index("IGNORE TOUTES")
-    assert injection_pos > cours_start, (
-        "L'injection doit être confinée dans <COURS> — jamais avant le délimiteur."
-    )
+    assert (
+        injection_pos > cours_start
+    ), "L'injection doit être confinée dans <COURS> — jamais avant le délimiteur."
     assert SYSTEM_PROMPT not in malicious_text
 
 
@@ -161,16 +161,18 @@ def test_t6_non_distinct_options_rejected():
     APRÈS patch : parse_and_validate_quiz exige 4 options distinctes par question.
     """
     # Simule une sortie avec options identiques (attaque structurelle)
-    bad_output = json.dumps({
-        "questions": [
-            {
-                "prompt": f"Question {i + 1} sur la photosynthèse ?",
-                "options": ["Réponse A", "Réponse A", "Réponse A", "Réponse A"],
-                "correct_index": 0,
-            }
-            for i in range(10)
-        ]
-    })
+    bad_output = json.dumps(
+        {
+            "questions": [
+                {
+                    "prompt": f"Question {i + 1} sur la photosynthèse ?",
+                    "options": ["Réponse A", "Réponse A", "Réponse A", "Réponse A"],
+                    "correct_index": 0,
+                }
+                for i in range(10)
+            ]
+        }
+    )
 
     with pytest.raises(LLMError, match="distinctes"):
         parse_and_validate_quiz(bad_output)

@@ -39,7 +39,9 @@ class OllamaLLMClient(LLMClient):
                 return parse_and_validate_quiz(raw)
             except LLMError as exc:
                 last_err = exc
-                logger.warning("Tentative %d/%d échouée — validation : %s", attempt, MAX_RETRIES, exc)
+                logger.warning(
+                    "Tentative %d/%d échouée — validation : %s", attempt, MAX_RETRIES, exc
+                )
         raise last_err  # type: ignore[misc]
 
     # ----- internals -----
