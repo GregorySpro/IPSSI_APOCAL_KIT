@@ -35,6 +35,9 @@ DJANGO_SETTINGS_MODULE = "apocal.settings"
 python_files = ["tests.py", "test_*.py", "*_tests.py"]
 addopts = "--strict-markers --tb=short -q"
 testpaths = ["accounts", "llm", "quizzes", "administration"]
+markers = [
+    "adversarial: tests de sécurité adversariaux (prompt injection OWASP LLM-01)",
+]
 
 [tool.coverage.run]
 source = ["accounts", "llm", "quizzes", "administration"]

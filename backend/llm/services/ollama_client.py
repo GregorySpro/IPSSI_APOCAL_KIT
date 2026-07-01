@@ -8,45 +8,53 @@ souveraineté des données + zéro coût. Sa contrepartie est la latence sur CPU
 quiz_prompt.py et partagés avec les clients OpenAI / Claude.
 """
 
+import logging
+
 import requests
 from django.conf import settings
 
 from .base import LLMClient, LLMError
-from .quiz_prompt import build_full_prompt, parse_and_validate_quiz
+from .quiz_prompt import MAX_RETRIES, build_messages_prompt, parse_and_validate_quiz
+
+logger = logging.getLogger(__name__)
 
 
 class OllamaLLMClient(LLMClient):
-    """Client HTTP minimal pour Ollama (/api/generate)."""
+    """Client HTTP pour Ollama — utilise /api/chat pour la séparation system/user."""
 
     def __init__(
         self, *, model: str | None = None, host: str | None = None, timeout: int | None = None
     ) -> None:
-        # Overrides éventuels (config admin en base, Lot 8) sinon valeurs .env.
         self.host = (host or settings.OLLAMA_HOST).rstrip("/")
         self.model = model or settings.OLLAMA_MODEL
-        # Configurable via OLLAMA_TIMEOUT (.env). Défaut 600 s : une génération
-        # 8B sur CPU peut dépasser largement 120 s (cf. perturbation J2 latence).
         self.timeout = timeout or settings.OLLAMA_TIMEOUT
 
     def generate_quiz(self, source_text: str, title: str) -> list[dict]:
-        # Ollama /api/generate attend UN prompt unique (pas de séparation
-        # system/user) : on concatène donc system + cours via build_full_prompt.
-        prompt = build_full_prompt(source_text, title)
-        raw = self._call_ollama(prompt)
-        return parse_and_validate_quiz(raw)
+        # Couche 2 — Séparation explicite system/user via /api/chat
+        messages = build_messages_prompt(source_text, title)
+        last_err: LLMError | None = None
+        for attempt in range(1, MAX_RETRIES + 1):
+            raw = self._call_ollama_chat(messages)
+            try:
+                return parse_and_validate_quiz(raw)
+            except LLMError as exc:
+                last_err = exc
+                logger.warning("Tentative %d/%d échouée — validation : %s", attempt, MAX_RETRIES, exc)
+        raise last_err  # type: ignore[misc]
 
     # ----- internals -----
 
-    def _call_ollama(self, prompt: str) -> str:
+    def _call_ollama_chat(self, messages: list[dict]) -> str:
+        """Appel vers /api/chat (séparation system/user native)."""
         try:
             response = requests.post(
-                f"{self.host}/api/generate",
+                f"{self.host}/api/chat",
                 json={
                     "model": self.model,
-                    "prompt": prompt,
+                    "messages": messages,
                     "stream": False,
-                    "options": {"temperature": 0.4},  # peu de créativité : on veut du factuel
-                    "format": "json",  # mode JSON strict d'Ollama si supporté
+                    "options": {"temperature": 0.4},
+                    "format": "json",
                 },
                 timeout=self.timeout,
             )
@@ -55,7 +63,7 @@ class OllamaLLMClient(LLMClient):
             raise LLMError(f"Ollama injoignable : {exc}") from exc
 
         data = response.json()
-        raw = data.get("response", "")
+        raw = data.get("message", {}).get("content", "")
         if not raw:
             raise LLMError("Ollama a renvoyé une réponse vide.")
         return raw

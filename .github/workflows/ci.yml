@@ -89,6 +89,9 @@ jobs:
       - name: Run pytest with coverage
         run: pytest --cov --cov-report=term-missing
 
+      - name: Run adversarial tests (prompt injection — OWASP LLM-01)
+        run: pytest -m adversarial -v --tb=short
+
   # --------------------------------------------------------------------------
   # FRONTEND — React + Vite + tests vitest
   # --------------------------------------------------------------------------
