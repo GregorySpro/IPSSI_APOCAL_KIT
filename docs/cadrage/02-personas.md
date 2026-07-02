@@ -1,6 +1,6 @@
 # Personas — EduTutor IA
 
-**Date :** 29/06/2026 · **Équipe :** EduTutor Groupe 14
+**Date :** 02/07/2026 (mis à jour J4) · **Équipe :** EduTutor Groupe 14
 
 ---
 
@@ -75,3 +75,41 @@
 - Back-office pour configurer le fournisseur LLM et gérer les utilisateurs
 - Logs d'utilisation et capacité à effacer les données (RGPD)
 - Déploiement Docker documenté, reproductible
+
+---
+
+## Persona 4 — Lucia, lycéenne espagnole malvoyante (émergente J4)
+
+**"Je veux réviser en espagnol avec mon lecteur d'écran — pas me battre contre une appli franco-française."**
+
+| Attribut | Détail |
+|----------|--------|
+| Âge | 17 ans |
+| Formation | Terminale scientifique, lycée public, Séville (Espagne) |
+| Situation | Échange Erasmus prévu en France — veut continuer à réviser à distance |
+| Appareils | Laptop macOS + lecteur d'écran VoiceOver, smartphone iOS |
+| Niveau tech | Intermédiaire — maîtrise les outils accessibles, utilise JAWS/VoiceOver au quotidien |
+| Handicap | Malvoyante sévère (acuité visuelle < 4/10) |
+
+### Objectifs
+- Générer des quiz à partir de ses cours en espagnol et recevoir les questions en espagnol
+- Naviguer dans l'interface entièrement au clavier (pas de souris)
+- Utiliser son lecteur d'écran sans friction (labels ARIA, ordre de focus logique)
+- Réviser dans sa langue maternelle, pas seulement en français
+
+### Frustrations
+- La plupart des apps edtech ne gèrent pas les lecteurs d'écran (images sans alt, boutons sans label)
+- Les contrastes trop faibles la pénalisent (ratio < 4.5:1 illisible pour elle)
+- Les interfaces ne proposent qu'une seule langue et ne détectent pas celle du navigateur
+- Elle ne peut pas utiliser les outils qui "sautent" le focus clavier sur certains éléments interactifs
+
+### Critères de succès
+- Interface navigable entièrement au clavier (Tab, Entrée, Échap, flèches)
+- Contraste texte/fond ≥ 4.5:1 (RGAA critère 3.2)
+- Tous les éléments interactifs ont un label ARIA lisible par VoiceOver
+- Le paramètre de langue `es` déclenche une réponse LLM en espagnol
+- Ordre de focus logique et focus visible sur chaque élément actif
+
+### Axes couverts
+- [a11y] Navigation clavier + ARIA + contrastes → RGAA niveau AA
+- [i18n] Interface et quiz traduits en espagnol

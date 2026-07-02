@@ -1,6 +1,6 @@
 # Product Backlog — EduTutor IA
 
-**Date :** 29/06/2026 · **Équipe :** EduTutor Groupe 14
+**Date :** 02/07/2026 (mis à jour J4) · **Équipe :** EduTutor Groupe 14
 **Méthode :** MoSCoW · Critères INVEST · DoR / DoD définis
 
 ---
@@ -110,3 +110,69 @@ Une story est terminée si :
 | US-22 | Révision ciblée des erreurs (mode flashcard) | Could | R2 |
 | US-23 | Génération haute qualité différée (llama3.1) | Won't R1 | R2 |
 | US-24 | Export quiz en PDF | Won't R1 | R2 |
+
+---
+
+## Backlog Release 3 — J4 (Scale · RGAA · i18n)
+
+### [a11y] Accessibilité RGAA
+
+### US-25 · [a11y] Audit RGAA + rapport
+**En tant qu'** administrateur, **je veux** un audit RGAA complet de l'interface, **afin de** connaître les écarts à corriger avant l'adoption institutionnelle.
+- CA1 : Rapport listant tous les critères RGAA de niveau 1 évalués
+- CA2 : Chaque critère bloquant est associé à un ticket de correctif
+- CA3 : Rapport disponible dans le repo (`docs/`)
+- **Estimation :** 8 pts · **MoSCoW :** Must · **R3**
+
+### US-26 · [a11y] Contrastes et focus visible
+**En tant que** Lucia (malvoyante), **je veux** que tous les textes respectent un ratio de contraste ≥ 4.5:1 et que le focus clavier soit toujours visible, **afin de** lire et naviguer sans effort.
+- CA1 : Ratio de contraste texte/fond ≥ 4.5:1 sur tous les composants (RGAA 3.2)
+- CA2 : Focus visible sur chaque élément interactif (outline non supprimé)
+- CA3 : Vérifiable avec l'outil axe-core en CI
+- **Estimation :** 5 pts · **MoSCoW :** Must · **R3**
+
+### US-27 · [a11y] Navigation clavier complète
+**En tant que** Lucia, **je veux** naviguer dans toute l'interface avec le clavier (Tab, Entrée, Échap, flèches), **afin de** ne pas utiliser la souris.
+- CA1 : Tous les éléments interactifs sont atteignables au Tab dans un ordre logique
+- CA2 : Les modales et menus sont fermables à l'Échap
+- CA3 : Aucun "piège de focus" (focus coincé dans un composant)
+- **Estimation :** 3 pts · **MoSCoW :** Must · **R3**
+
+### [i18n] Internationalisation
+
+### US-28 · [i18n] Externalisation des textes UI
+**En tant que** développeur, **je veux** que tous les textes de l'interface soient externalisés dans des fichiers de traduction (fr/en/es), **afin de** permettre le changement de langue sans modifier le code.
+- CA1 : Bibliothèque i18n intégrée (ex : i18next)
+- CA2 : Fichiers de traduction pour fr, en, es disponibles dans le repo
+- CA3 : Aucun texte en dur dans les composants React
+- **Estimation :** 8 pts · **MoSCoW :** Must · **R3**
+
+### US-29 · [i18n] Paramètre de langue du LLM à la volée
+**En tant que** Lucia, **je veux** que le quiz soit généré dans la langue que j'ai sélectionnée dans l'interface, **afin de** réviser dans ma langue maternelle.
+- CA1 : Un paramètre `lang` est ajouté au system prompt Ollama (ex : "Génère le quiz en espagnol")
+- CA2 : Le changement de langue est effectif sans redémarrage du serveur
+- CA3 : Testé pour fr, en, es
+- **Estimation :** 5 pts · **MoSCoW :** Should · **R3**
+
+### [scale] Scalabilité
+
+### US-30 · [scale] Tests de charge
+**En tant qu'** administrateur, **je veux** un rapport de tests de charge validant la tenue à 10 000 utilisateurs simultanés, **afin de** garantir la disponibilité lors de pics nationaux.
+- CA1 : Scénario de charge simulé avec k6 ou Locust
+- CA2 : p95 < 15s maintenu jusqu'à 10 000 utilisateurs simultanés
+- CA3 : Rapport disponible dans le repo
+- **Estimation :** 5 pts · **MoSCoW :** Must · **R3**
+
+### US-31 · [scale] Cache Redis sur les appels LLM
+**En tant qu'** administrateur, **je veux** que les requêtes LLM identiques soient mises en cache (Redis), **afin de** réduire la charge sur Ollama et améliorer la latence à grande échelle.
+- CA1 : Un quiz généré pour un texte source identique est servi depuis le cache en < 100ms
+- CA2 : Le cache expire après 24h (TTL configurable)
+- CA3 : La désactivation du cache est possible via variable d'environnement
+- **Estimation :** 8 pts · **MoSCoW :** Must · **R3**
+
+### US-32 · [risk] Fournisseur LLM de secours
+**En tant qu'** administrateur, **je veux** configurer un LLM de secours (ex : OpenAI GPT-4o mini) qui prend le relais automatiquement si Ollama est indisponible, **afin de** garantir la continuité de service.
+- CA1 : Si Ollama répond avec une erreur ou timeout, le fallback est déclenché automatiquement
+- CA2 : Le fournisseur de secours est configurable via variable d'environnement
+- CA3 : Un log `WARNING` indique chaque basculement
+- **Estimation :** 5 pts · **MoSCoW :** Could · **R3**

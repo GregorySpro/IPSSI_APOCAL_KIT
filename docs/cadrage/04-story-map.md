@@ -1,6 +1,6 @@
 # Story Map — EduTutor IA
 
-**Date :** 29/06/2026 · **Équipe :** EduTutor Groupe 14
+**Date :** 02/07/2026 (mis à jour J4) · **Équipe :** EduTutor Groupe 14
 
 ---
 
@@ -25,7 +25,7 @@ SE CONNECTER → FOURNIR UN COURS → GÉNÉRER UN QUIZ → PASSER LE QUIZ → C
 | **Consulter ses résultats** | Voir son score /10 · Voir le détail bonnes/mauvaises réponses |
 | **Suivre sa progression** | Consulter l'historique des quizz (date, cours, score) |
 
-### RELEASE 2 — Pistes à affiner (jeudi 02/07 17h45)
+### RELEASE 2 — Évolutions enseignant + engagement (jeudi 02/07 17h45)
 
 | Activité | User Stories envisagées |
 |----------|-------------------------|
@@ -35,13 +35,21 @@ SE CONNECTER → FOURNIR UN COURS → GÉNÉRER UN QUIZ → PASSER LE QUIZ → C
 | **Mode sombre** | Basculer entre thème clair et sombre |
 | **Génération haute qualité** | Choisir entre génération rapide (llama3.2) et haute qualité (llama3.1, mode différé) |
 
+### RELEASE 3 — Scale · RGAA · i18n (J4 — perturbation adoption nationale)
+
+| Axe | Activité | User Stories |
+|-----|----------|-------------|
+| **[a11y]** | Accessibilité RGAA | Audit RGAA niveau AA · Correctifs contrastes & focus visible · Navigation clavier complète · Labels ARIA sur tous les éléments interactifs |
+| **[i18n]** | Internationalisation | Externaliser les textes en fichiers de langue (fr/en/es) · Détecter la langue du navigateur · Paramètre de langue transmis au LLM à la volée · Interface traduite en espagnol |
+| **[scale]** | Passage à l'échelle | Tests de charge (10 000 utilisateurs simultanés) · Cache Redis sur les réponses LLM · Autoscaling horizontal · Fournisseur LLM de secours |
+| **[risk]** | Résilience & monitoring | Monitoring disponibilité (Prometheus/Grafana) · Alertes automatiques · Politique de rétention des données |
+
 ---
 
-## Priorisation MoSCoW Release 1
+## Priorisation MoSCoW par release
 
-| Priorité | Features |
-|----------|---------|
-| **Must** | F1 Auth · F2 Upload · F3 Génération · F4 Correction · F5 Score · F6 Historique |
-| **Should** | Pages légales RGPD · Feedback pendant génération |
-| **Could** | Mode sombre (déjà fourni dans la base) |
-| **Won't** | Mode enseignant · Export PDF · Dashboard avancé |
+| Release | Must | Should | Could | Won't |
+|---------|------|--------|-------|-------|
+| **R1** | F1 Auth · F2 Upload · F3 Génération · F4 Correction · F5 Score · F6 Historique | Pages légales RGPD · Feedback génération | Mode sombre (fourni) | Mode enseignant · Export PDF |
+| **R2** | Mode enseignant (Mme Lefèvre) | Dashboard · Révision erreurs | Mode sombre · HQ différé | Mobile natif · SSO |
+| **R3 [J4]** | Audit RGAA + correctifs · Externalisation i18n (fr/en/es) · Tests de charge + cache | Paramètre langue LLM · Monitoring · Alertes | LLM de secours · Autoscaling | Conformité WCAG 2.2 AAA |
