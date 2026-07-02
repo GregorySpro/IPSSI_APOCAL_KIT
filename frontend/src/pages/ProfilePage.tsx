@@ -248,8 +248,8 @@ export default function ProfilePage() {
       <section className="card bg-slate-50">
         <h2 className="text-lg font-semibold text-slate-900 mb-2">Mes données</h2>
         <p className="text-sm text-slate-500 mb-4">
-          Exercez votre droit à la portabilité (RGPD) : téléchargez l'intégralité de vos
-          données personnelles (compte, quiz, réponses).
+          Exercez votre droit à la portabilité (RGPD) : téléchargez l'intégralité de vos données
+          personnelles (compte, quiz, réponses).
         </p>
         {exportErr && (
           <div className="mb-4 p-3 bg-rose-50 border-l-4 border-rose-500 text-sm text-rose-900 rounded">
@@ -281,8 +281,8 @@ export default function ProfilePage() {
         <h2 className="text-lg font-semibold text-rose-700 mb-2">Zone de danger</h2>
         <p className="text-sm text-slate-600 mb-4">
           La suppression de votre compte est <strong>définitive</strong> et efface toutes vos
-          données (quiz, historique). Cette action est irréversible. Pensez à exporter vos
-          données ci-dessus avant de continuer.
+          données (quiz, historique). Cette action est irréversible. Pensez à exporter vos données
+          ci-dessus avant de continuer.
         </p>
         {delErr && (
           <div className="mb-4 p-3 bg-rose-50 border-l-4 border-rose-500 text-sm text-rose-900 rounded">
