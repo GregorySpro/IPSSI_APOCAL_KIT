@@ -5,8 +5,6 @@ Lancez : pytest accounts/
 """
 
 import json
-import zipfile
-from io import BytesIO
 
 import pytest
 from django.contrib.auth.models import User
