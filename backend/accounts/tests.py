@@ -160,6 +160,7 @@ def test_export_empty_quizzes(authed_client, user):
     assert data["quizzes"] == []
     assert data["stats"]["total_quizzes"] == 0
 
+
 def test_export_invalid_format(authed_client):
     response = authed_client.get("/api/accounts/me/export/?format=pdf")
     assert response.status_code == 400

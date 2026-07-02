@@ -154,7 +154,9 @@ class MeExportView(APIView):
         fmt = request.query_params.get("format", "json").lower()
         if fmt not in VALID_FORMATS:
             return Response(
-                {"detail": f"Format invalide. Valeurs acceptées : {', '.join(sorted(VALID_FORMATS))}."},
+                {
+                    "detail": f"Format invalide. Valeurs acceptées : {', '.join(sorted(VALID_FORMATS))}."
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
