@@ -162,5 +162,5 @@ def test_export_empty_quizzes(authed_client, user):
 
 
 def test_export_invalid_format(authed_client):
-    response = authed_client.get("/api/accounts/me/export/?format=pdf")
+    response = authed_client.get("/api/accounts/me/export/?export_format=pdf")
     assert response.status_code == 400

@@ -151,7 +151,7 @@ class MeExportView(APIView):
             response_json,
         )
 
-        fmt = request.query_params.get("format", "json").lower()
+        fmt = request.query_params.get("export_format", "json").lower()
         if fmt not in VALID_FORMATS:
             return Response(
                 {
